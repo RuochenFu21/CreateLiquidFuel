@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "org.forsteri123.createliquidfuel.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "CreateLiquidFuel.refmap.json",
+  "mixins": [
+    "MixinBlazeBurnerTileEntity"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

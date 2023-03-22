@@ -1,0 +1,5 @@
+{
+  "fluid": "minecraft:lava",
+  "burnTime": 20,
+  "superHeat": false
+}
