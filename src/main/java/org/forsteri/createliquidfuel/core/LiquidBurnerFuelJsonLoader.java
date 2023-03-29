@@ -1,9 +1,8 @@
-package org.forsteri123.createliquidfuel.core;
+package org.forsteri.createliquidfuel.core;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
@@ -26,7 +25,7 @@ public class LiquidBurnerFuelJsonLoader extends SimpleJsonResourceReloadListener
     public static final LiquidBurnerFuelJsonLoader INSTANCE = new LiquidBurnerFuelJsonLoader();
 
     public LiquidBurnerFuelJsonLoader() {
-        super(GSON, "potato_cannon_projectile_types");
+        super(GSON, "blaze_burner_fuel");
     }
 
     @Override

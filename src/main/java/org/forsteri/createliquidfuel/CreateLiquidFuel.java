@@ -1,9 +1,7 @@
-package org.forsteri123.createliquidfuel;
+package org.forsteri.createliquidfuel;
 
 
 import com.mojang.logging.LogUtils;
-import com.simibubi.create.content.curiosities.weapons.PotatoProjectileTypeManager;
-import com.simibubi.create.foundation.utility.recipe.RecipeFinder;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.MinecraftForge;
@@ -17,7 +15,7 @@ import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import org.forsteri123.createliquidfuel.core.LiquidBurnerFuelJsonLoader;
+import org.forsteri.createliquidfuel.core.LiquidBurnerFuelJsonLoader;
 import org.slf4j.Logger;
 
 import java.util.stream.Collectors;

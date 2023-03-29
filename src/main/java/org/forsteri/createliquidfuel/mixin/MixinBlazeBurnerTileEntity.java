@@ -1,11 +1,11 @@
-package org.forsteri123.createliquidfuel.mixin;
+package org.forsteri.createliquidfuel.mixin;
 
-import com.simibubi.create.content.contraptions.processing.HeatCondition;
-import com.simibubi.create.content.contraptions.processing.burner.BlazeBurnerBlock;
-import com.simibubi.create.content.contraptions.processing.burner.BlazeBurnerTileEntity;
+import com.simibubi.create.content.processing.burner.BlazeBurnerBlock;
+import com.simibubi.create.content.processing.burner.BlazeBurnerBlockEntity;
+import com.simibubi.create.content.processing.recipe.HeatCondition;
+import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
+import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.fluid.SmartFluidTank;
-import com.simibubi.create.foundation.tileEntity.SmartTileEntity;
-import com.simibubi.create.foundation.tileEntity.TileEntityBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -13,10 +13,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import org.forsteri123.createliquidfuel.core.BurnerStomachHandler;
-import org.forsteri123.createliquidfuel.core.LiquidBurnerFuelJsonLoader;
+import org.forsteri.createliquidfuel.core.BurnerStomachHandler;
+import org.forsteri.createliquidfuel.core.LiquidBurnerFuelJsonLoader;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -28,8 +27,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
-@Mixin(value = BlazeBurnerTileEntity.class, remap = false)
-public abstract class MixinBlazeBurnerTileEntity extends SmartTileEntity {
+@Mixin(value = BlazeBurnerBlockEntity.class, remap = false)
+public abstract class MixinBlazeBurnerTileEntity extends SmartBlockEntity {
 
     @Shadow protected int remainingBurnTime;
     @Shadow @Final public static int MAX_HEAT_CAPACITY;
@@ -54,7 +53,7 @@ public abstract class MixinBlazeBurnerTileEntity extends SmartTileEntity {
     }
 
     @Override
-    public void addBehaviours(List<TileEntityBehaviour> behaviours) {
+    public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         System.out.println("Check Beh");
         IFluidHandler[] handlers = new IFluidHandler[10];
         for (int i = 0; i < 10; i++) {
