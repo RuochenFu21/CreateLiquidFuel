@@ -1,5 +1,6 @@
 package org.forsteri.createliquidfuel.mixin;
 
+import com.mojang.datafixers.util.Pair;
 import com.simibubi.create.content.processing.burner.BlazeBurnerBlock;
 import com.simibubi.create.content.processing.burner.BlazeBurnerBlockEntity;
 import com.simibubi.create.content.processing.recipe.HeatCondition;
@@ -68,35 +69,38 @@ public abstract class MixinBlazeBurnerTileEntity extends SmartBlockEntity {
     @Inject(method = "tick", at = @At("HEAD"))
     public void tick(CallbackInfo info) {
         if (stomach != null) {
-            System.out.println("Check A");
             for (int i = 0; i < 10; i++) {
                 if (stomach.getFluidInTank(i).getAmount() > 0) {
-                    System.out.println("Check B");
                     boolean superHeating = HeatCondition.SUPERHEATED.testBlazeBurner(
                             getHeatLevelFromBlock()
                     );
 
-                    boolean fluidSuperHeats = LiquidBurnerFuelJsonLoader.LIQUID_BURNER_FUEL_MAP.get(
-                            stomach.getFluidInTank(i).getFluid()).getSecond();
+                    Pair<Integer, Boolean> superheats = LiquidBurnerFuelJsonLoader.LIQUID_BURNER_FUEL_MAP.get(
+                            stomach.getFluidInTank(i).getFluid());
+
+                    if (superheats == null)
+                        return;
+
+                    boolean fluidSuperHeats = superheats.getSecond();
 
                     int usingFluidAtATime = superHeating ? 1 : 10;
 
                     if (remainingBurnTime <= MAX_HEAT_CAPACITY) {
-                        System.out.println("Check C");
+                        Pair<Integer, Boolean> _superheats = LiquidBurnerFuelJsonLoader.LIQUID_BURNER_FUEL_MAP.get(
+                                stomach.getFluidInTank(i).getFluid());
+
+                        if (_superheats == null)
+                            return;
 
                         if ((remainingBurnTime + (
                                 usingFluidAtATime
-                                * LiquidBurnerFuelJsonLoader.LIQUID_BURNER_FUEL_MAP.get(
-                                stomach.getFluidInTank(i).getFluid()).getFirst()) <= MAX_HEAT_CAPACITY)){
-                            System.out.println("Check D");
-
+                                * _superheats.getFirst()) <= MAX_HEAT_CAPACITY)){
                             if (fluidSuperHeats)
                                 setBlockHeat(BlazeBurnerBlock.HeatLevel.SEETHING);
                             else
                                 setBlockHeat(BlazeBurnerBlock.HeatLevel.FADING);
 
-                            remainingBurnTime += usingFluidAtATime * LiquidBurnerFuelJsonLoader.LIQUID_BURNER_FUEL_MAP.get(
-                                    stomach.getFluidInTank(i).getFluid()).getFirst();
+                            remainingBurnTime += usingFluidAtATime * _superheats.getFirst();
 
                             stomach.getFluidInTank(i).shrink(usingFluidAtATime);
                         }
