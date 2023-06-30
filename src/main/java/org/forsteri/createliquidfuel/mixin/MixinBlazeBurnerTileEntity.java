@@ -47,7 +47,6 @@ public abstract class MixinBlazeBurnerTileEntity extends SmartBlockEntity {
     @NotNull
     @Override
     public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        System.out.println("Check Cap");
         if (isFluidHandlerCap(cap))
             return LazyOptional.of(() -> stomach).cast();
         return super.getCapability(cap, side);
@@ -55,7 +54,6 @@ public abstract class MixinBlazeBurnerTileEntity extends SmartBlockEntity {
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
-        System.out.println("Check Beh");
         IFluidHandler[] handlers = new IFluidHandler[10];
         for (int i = 0; i < 10; i++) {
             handlers[i] = new SmartFluidTank(1000, (FluidStack contents)->{});
