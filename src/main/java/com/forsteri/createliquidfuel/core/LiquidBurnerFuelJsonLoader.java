@@ -1,5 +1,6 @@
-package org.forsteri.createliquidfuel.core;
+package com.forsteri.createliquidfuel.core;
 
+import com.forsteri.createliquidfuel.util.Triplet;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -13,14 +14,12 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class LiquidBurnerFuelJsonLoader extends SimpleJsonResourceReloadListener {
+    public static final ResourceLocation IDENTIFIER = ResourceLocation.of("createliquidfuel:drainable_fuel_loader", ':');
 
     private static final Gson GSON = new Gson();
-
-    public static Map<Fluid, Pair<Integer, Boolean>> LIQUID_BURNER_FUEL_MAP = new HashMap<>();
 
     public static final LiquidBurnerFuelJsonLoader INSTANCE = new LiquidBurnerFuelJsonLoader();
 
@@ -41,12 +40,22 @@ public class LiquidBurnerFuelJsonLoader extends SimpleJsonResourceReloadListener
                     try {
                         Fluid value = ForgeRegistries.FLUIDS.getValue(new ResourceLocation(fluidElement.getAsString()));
                         if (value != null) {
-                            LIQUID_BURNER_FUEL_MAP.put(value,
-                                    new Pair<>(
-                                        object.has("burnTime") ?
-                                                object.get("burnTime").getAsInt() :
-                                                20 // Lava Burn Time per ML
-                                            , object.has("superHeat") && object.get("superHeat").getAsBoolean() // default not to superheat
+                            BurnerStomachHandler.LIQUID_BURNER_FUEL_MAP.put(value,
+                                    Pair.of(
+                                            IDENTIFIER,
+                                            Triplet.of(
+                                                object.has("burnTime") ?
+                                                        object.get("burnTime").getAsInt() :
+                                                        object.has("superHeat") && object.get("superHeat").getAsBoolean() ?
+                                                                32 : 20
+                                                    // Lava Burn Time per Mb is 20, create mod codes sets that 32 * 1000 / 10 for any superheat
+                                                    // This is from BlazeBurnerBlockEntity#tryUpdateFuel (Line 193)
+                                                    , object.has("superHeat") && object.get("superHeat").getAsBoolean() // default not to superheat
+                                                    , object.has("amountConsumedPerTick") ?
+                                                            object.get("amountConsumedPerTick").getAsInt() :
+                                                            object.has("superHeat") && object.get("superHeat").getAsBoolean() ?
+                                                                    10 : 1 // default not to consume 10 if superHeat, 1 if not
+                                            )
                                     )
                                     );
                         }

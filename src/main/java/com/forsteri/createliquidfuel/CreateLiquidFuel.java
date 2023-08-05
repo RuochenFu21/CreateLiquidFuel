@@ -1,11 +1,12 @@
-package org.forsteri.createliquidfuel;
+package com.forsteri.createliquidfuel;
 
 
+import com.forsteri.createliquidfuel.core.DrainableFuelLoader;
+import com.forsteri.createliquidfuel.core.LiquidBurnerFuelJsonLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import org.forsteri.createliquidfuel.core.LiquidBurnerFuelJsonLoader;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(CreateLiquidFuel.MOD_ID)
@@ -16,6 +17,8 @@ public class CreateLiquidFuel {
 
     public CreateLiquidFuel() {
         MinecraftForge.EVENT_BUS.register(this);
+
+        DrainableFuelLoader.load();
     }
 
     @Mod.EventBusSubscriber

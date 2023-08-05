@@ -15,8 +15,8 @@ plugins {
 
 apply plugin: 'org.spongepowered.mixin'
 
-group = 'org.forsteri'
-version = '1.4'
+group = 'com.forsteri'
+version = "${mod_version}-${mc_version}"
 
 java {
     archivesBaseName = 'createliquidfuel'
@@ -37,7 +37,7 @@ minecraft {
     //
     // Use non-default mappings at your own risk. They may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'official', version: '1.18.2'
+    mappings channel: 'official', version: mc_version
 
     // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
