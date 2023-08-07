@@ -19,7 +19,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.HashMap;
 import java.util.Map;
 
-@SuppressWarnings("removal")
 public class BurnerStomachHandler {
     public static Map<Fluid, Pair<ResourceLocation, Triplet<Integer, Boolean, Integer>>> LIQUID_BURNER_FUEL_MAP = new HashMap<>();
 
@@ -27,7 +26,7 @@ public class BurnerStomachHandler {
         if (!(entity instanceof BlazeBurnerAccessor burnerAccessor)) return;
 
         @SuppressWarnings("DataFlowIssue")
-        SmartFluidTank stomach = (SmartFluidTank) entity.getCapability(net.minecraftforge.fluids.capability.CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY).orElse(null);
+        SmartFluidTank stomach = (SmartFluidTank) entity.getCapability(ForgeCapabilities.FLUID_HANDLER).orElse(null);
 
         //noinspection ConstantValue
         if (stomach == null)
@@ -68,7 +67,7 @@ public class BurnerStomachHandler {
 
     public static void tryUpdateFuel(@NotNull SmartBlockEntity entity, ItemStack itemStack, boolean forceOverflow, boolean simulate, CallbackInfoReturnable<Boolean> cir) {
         @SuppressWarnings("DataFlowIssue")
-        SmartFluidTank stomach = (SmartFluidTank) entity.getCapability(net.minecraftforge.fluids.capability.CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY).orElse(null);
+        SmartFluidTank stomach = (SmartFluidTank) entity.getCapability(ForgeCapabilities.FLUID_HANDLER).orElse(null);
 
         //noinspection ConstantValue
         if (stomach == null) return;
