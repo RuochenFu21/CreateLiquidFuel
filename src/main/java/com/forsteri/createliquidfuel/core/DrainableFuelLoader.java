@@ -7,7 +7,7 @@ import com.simibubi.create.AllTags;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class DrainableFuelLoader {
@@ -22,7 +22,7 @@ public class DrainableFuelLoader {
             if (burnTime <= 0)
                 return;
 
-            stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(handler -> {
+            stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(handler -> {
                 if (handler.getTanks() != 1)
                     return;
 
