@@ -9,7 +9,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 // The value here should match an entry in the META-INF/mods.toml file
-@Mod(CreateLiquidFuel.MOD_ID)
+@Mod(value = CreateLiquidFuel.MOD_ID)
 public class CreateLiquidFuel {
 
     // Directly reference a slf4j logger
