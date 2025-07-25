@@ -43,16 +43,26 @@ public class BurnerStomachHandler {
         boolean fluidSuperHeats = burnerProperty.getSecond();
 
         int mbConsuming = burnerProperty.getThird();
+        int fluidAmount = stomach.getFluid().getAmount();
 
-        if (stomach.getFluid().getAmount() < mbConsuming) {
+        if (fluidAmount < mbConsuming) {
             stomach.getFluid().setAmount(0);
             return;
         }
 
         if (fluidSuperHeats)
             burnerAccessor.createliquidfuel$invokeSetBlockHeat(BlazeBurnerBlock.HeatLevel.SEETHING);
-        else
-            burnerAccessor.createliquidfuel$invokeSetBlockHeat(BlazeBurnerBlock.HeatLevel.FADING);
+        else {
+            int burnTime = burnerProperty.getFirst();
+
+            //Copy from BlazeBurnerBlockEntity#getHeatLevel, case NORMAL.
+            int allFluidRemainingBurnTime = fluidAmount * burnTime;
+            boolean lowPercent = (double)allFluidRemainingBurnTime / 10000.0 < 0.0125;
+            BlazeBurnerBlock.HeatLevel level = lowPercent ? BlazeBurnerBlock.HeatLevel.FADING : BlazeBurnerBlock.HeatLevel.KINDLED;
+
+            burnerAccessor.createliquidfuel$invokeSetBlockHeat(level);
+        }
+
 
         int newBurnTime = burnerAccessor.createliquidfuel$getRemainingBurnTime() + burnerProperty.getFirst();
 
