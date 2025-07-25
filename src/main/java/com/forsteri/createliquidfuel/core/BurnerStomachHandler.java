@@ -54,9 +54,9 @@ public class BurnerStomachHandler {
             burnerAccessor.createliquidfuel$invokeSetBlockHeat(BlazeBurnerBlock.HeatLevel.SEETHING);
         else {
             int burnTime = burnerProperty.getFirst();
+            int allFluidRemainingBurnTime = fluidAmount * burnTime;
 
             //Copy from BlazeBurnerBlockEntity#getHeatLevel, case NORMAL.
-            int allFluidRemainingBurnTime = fluidAmount * burnTime;
             boolean lowPercent = (double)allFluidRemainingBurnTime / 10000.0 < 0.0125;
             BlazeBurnerBlock.HeatLevel level = lowPercent ? BlazeBurnerBlock.HeatLevel.FADING : BlazeBurnerBlock.HeatLevel.KINDLED;
 
