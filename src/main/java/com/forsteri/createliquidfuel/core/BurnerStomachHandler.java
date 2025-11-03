@@ -85,15 +85,15 @@ public class BurnerStomachHandler {
         if (!BurnerStomachHandler.LIQUID_BURNER_FUEL_MAP.containsKey(fluidStack.getFluid()))
             return;
 
+
         if (stomach.getFluid().getAmount() + fluidStack.getAmount() > stomach.getCapacity()) {
             if (!forceOverflow) return;
         }
 
         if (!simulate) {
-            if (stomach.getFluid().isEmpty())
-                stomach.setFluid(fluidStack.copy());
-            else
-                stomach.getFluid().grow(fluidStack.getAmount());
+            int amount = fluidStack.getAmount();
+            FluidStack drained = handler.drain(amount, IFluidHandler.FluidAction.EXECUTE);
+            stomach.fill(drained, IFluidHandler.FluidAction.EXECUTE);
         }
 
         cir.setReturnValue(true);
