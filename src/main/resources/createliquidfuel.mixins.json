@@ -6,6 +6,7 @@
   "refmap": "CreateLiquidFuel.refmap.json",
   "mixins": [
     "BlazeBurnerAccessor",
+    "MixinBlazeBurnerBlock",
     "MixinBlazeBurnerTileEntity"
   ],
   "client": [

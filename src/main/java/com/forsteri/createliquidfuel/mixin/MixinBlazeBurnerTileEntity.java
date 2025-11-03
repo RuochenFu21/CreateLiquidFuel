@@ -52,9 +52,9 @@ public abstract class MixinBlazeBurnerTileEntity extends SmartBlockEntity {
         };
     }
 
-    @Inject(method = "tick", at = @At("TAIL"))
+    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lcom/simibubi/create/content/processing/burner/BlazeBurnerBlockEntity;updateBlockState()V", ordinal = 1), cancellable = true)
     public void tick(CallbackInfo info) {
-        BurnerStomachHandler.tick(this);
+        if (BurnerStomachHandler.tick(this)) info.cancel();
     }
 
     @Inject(method = "read", at = @At("TAIL"))
