@@ -1,6 +1,5 @@
 package com.forsteri.createliquidfuel.core;
 
-import com.forsteri.createliquidfuel.CreateLiquidFuel;
 import com.forsteri.createliquidfuel.mixin.BlazeBurnerAccessor;
 import com.forsteri.createliquidfuel.util.Triplet;
 import com.mojang.datafixers.util.Pair;
@@ -12,12 +11,10 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.HashMap;
@@ -40,16 +37,12 @@ public class BurnerStomachHandler {
 
         if (stomach.getFluid().getAmount() <= 0) return;
 
-        Pair<ResourceLocation, Triplet<Integer, Boolean, Integer>> propertyPair =
-                LIQUID_BURNER_FUEL_MAP.get(stomach.getFluid().getFluid());
-        if (propertyPair == null) return;
-
-        Triplet<Integer, Boolean, Integer> burnerProperty = propertyPair.getSecond();
+        LiquidFuel burnerProperty = LiquidFuels.get(stomach.getFluid().getFluid());
         if (burnerProperty == null) return;
 
-        boolean fluidSuperHeats = burnerProperty.getSecond();
+        boolean fluidSuperHeats = burnerProperty.superHeat();
 
-        int mbConsuming = burnerProperty.getThird();
+        int mbConsuming = burnerProperty.amountConsumedPerTick();
 
         if (stomach.getFluid().getAmount() < mbConsuming) {
             stomach.getFluid().setAmount(0);
@@ -61,7 +54,7 @@ public class BurnerStomachHandler {
         else
             burnerAccessor.createliquidfuel$invokeSetBlockHeat(BlazeBurnerBlock.HeatLevel.FADING);
 
-        int newBurnTime = burnerAccessor.createliquidfuel$getRemainingBurnTime() + burnerProperty.getFirst();
+        int newBurnTime = burnerAccessor.createliquidfuel$getRemainingBurnTime() + burnerProperty.burnTime();
 
         if (newBurnTime > BlazeBurnerBlockEntity.MAX_HEAT_CAPACITY) {
             return;
@@ -92,7 +85,7 @@ public class BurnerStomachHandler {
         if (handler.getTanks() != 1) return;
         FluidStack fluidStack = handler.getFluidInTank(0);
         if (fluidStack.isEmpty()) return;
-        if (!BurnerStomachHandler.LIQUID_BURNER_FUEL_MAP.containsKey(fluidStack.getFluid()))
+        if (!LiquidFuels.isFuel(fluidStack.getFluid()))
             return;
 
         if (stomach.getFluid().getAmount() + fluidStack.getAmount() > stomach.getCapacity()) {

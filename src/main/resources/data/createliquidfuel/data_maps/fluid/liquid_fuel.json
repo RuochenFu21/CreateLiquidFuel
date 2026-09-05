@@ -1,0 +1,48 @@
+{
+  "values": {
+    "minecraft:lava": {
+      "burnTime": 20,
+      "superHeat": false,
+      "amountConsumedPerTick": 1
+    },
+    "createaddition:seed_oil": {
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "createaddition"
+        }
+      ],
+      "neoforge:value": {
+        "burnTime": 10,
+        "superHeat": false,
+        "amountConsumedPerTick": 2
+      }
+    },
+    "createaddition:bioethanol": {
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "createaddition"
+        }
+      ],
+      "neoforge:value": {
+        "burnTime": 24,
+        "superHeat": true,
+        "amountConsumedPerTick": 1
+      }
+    },
+    "garnished:peanut_oil": {
+      "neoforge:conditions": [
+        {
+          "type": "neoforge:mod_loaded",
+          "modid": "garnished"
+        }
+      ],
+      "neoforge:value": {
+        "burnTime": 10,
+        "superHeat": true,
+        "amountConsumedPerTick": 2
+      }
+    }
+  }
+}

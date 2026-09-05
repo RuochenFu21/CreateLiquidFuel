@@ -23,5 +23,6 @@ public class CreateLiquidFuel {
         IEventBus MOD_BUS = modContainer.getEventBus();
         MOD_BUS.addListener(ModEventHandler::commonSetup);
         MOD_BUS.addListener(ModEventHandler::registerCapabilities);
+        MOD_BUS.addListener(ModEventHandler::registerDataMapTypes);
     }
 }

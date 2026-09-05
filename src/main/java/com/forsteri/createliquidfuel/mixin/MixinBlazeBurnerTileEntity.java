@@ -2,6 +2,7 @@ package com.forsteri.createliquidfuel.mixin;
 
 import com.forsteri.createliquidfuel.core.BurnerStomachHandler;
 import com.forsteri.createliquidfuel.core.IHasStomach;
+import com.forsteri.createliquidfuel.core.LiquidFuels;
 import com.simibubi.create.content.fluids.tank.FluidTankBlock;
 import com.simibubi.create.content.processing.burner.BlazeBurnerBlock;
 import com.simibubi.create.content.processing.burner.BlazeBurnerBlockEntity;
@@ -44,7 +45,7 @@ public abstract class MixinBlazeBurnerTileEntity extends SmartBlockEntity implem
         {
             @Override
             public boolean isFluidValid(@NotNull FluidStack stack) {
-                return BurnerStomachHandler.LIQUID_BURNER_FUEL_MAP.containsKey(stack.getFluid());
+                return LiquidFuels.isFuel(stack.getFluid());
             }
         };
     }

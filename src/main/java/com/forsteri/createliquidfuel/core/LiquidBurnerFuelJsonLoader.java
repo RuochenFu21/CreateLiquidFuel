@@ -13,13 +13,15 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.material.Fluid;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * One-version compatibility loader for {@code data/<namespace>/compat/*.json}.
+ * New packs should use the {@code createliquidfuel:liquid_fuel} data map.
+ */
 public class LiquidBurnerFuelJsonLoader extends SimpleJsonResourceReloadListener {
     public static final ResourceLocation IDENTIFIER = ResourceLocation.fromNamespaceAndPath("createliquidfuel", "drainable_fuel_loader");
 
@@ -32,44 +34,59 @@ public class LiquidBurnerFuelJsonLoader extends SimpleJsonResourceReloadListener
     }
 
     @Override
-    protected void apply(Map<ResourceLocation, JsonElement> p_10793_, @NotNull ResourceManager p_10794_, @NotNull ProfilerFiller p_10795_) {
-        for (Map.Entry<ResourceLocation, JsonElement> entry : p_10793_.entrySet()) {
-            JsonElement element = entry.getValue();
-            if (element.isJsonObject()) {
-                ResourceLocation id = entry.getKey();
-                JsonObject object = element.getAsJsonObject();
-                JsonElement fluidElement = object.get("fluid");
+    protected void apply(Map<ResourceLocation, JsonElement> entries, @NotNull ResourceManager resourceManager, @NotNull ProfilerFiller profiler) {
+        BurnerStomachHandler.LIQUID_BURNER_FUEL_MAP.entrySet()
+                .removeIf(entry -> IDENTIFIER.equals(entry.getValue().getFirst()));
 
-                if (fluidElement != null) {
-                    try {
-                        Optional<Fluid> value = BuiltInRegistries.FLUID.getOptional(ResourceLocation.parse(fluidElement.getAsString()));
-                        if (value.isPresent()) {
-                            BurnerStomachHandler.LIQUID_BURNER_FUEL_MAP.put(value.get(),
-                                    Pair.of(
-                                            IDENTIFIER,
-                                            Triplet.of(
-                                                object.has("burnTime") ?
-                                                        object.get("burnTime").getAsInt() :
-                                                        object.has("superHeat") && object.get("superHeat").getAsBoolean() ?
-                                                                32 : 20
-                                                    // Lava Burn Time per Mb is 20, create mod codes sets that 32 * 1000 / 10 for any superheat
-                                                    // This is from BlazeBurnerBlockEntity#tryUpdateFuel (Line 193)
-                                                    , object.has("superHeat") && object.get("superHeat").getAsBoolean() // default not to superheat
-                                                    , object.has("amountConsumedPerTick") ?
-                                                            object.get("amountConsumedPerTick").getAsInt() :
-                                                            object.has("superHeat") && object.get("superHeat").getAsBoolean() ?
-                                                                    10 : 1 // default not to consume 10 if superHeat, 1 if not
-                                            )
-                                    )
-                                    );
-                        }
-                    } catch (ResourceLocationException e) {
-                        throw new RuntimeException("Fluid liquid burner fuel " + id + " has invalid fluid: " + fluidElement.getAsString());
-                    }
-                } else {
-                    throw new RuntimeException("No fluid specified for liquid burner fuel: " + id);
-                }
+        for (Map.Entry<ResourceLocation, JsonElement> entry : entries.entrySet()) {
+            JsonElement element = entry.getValue();
+            if (!element.isJsonObject()) {
+                continue;
             }
+
+            ResourceLocation id = entry.getKey();
+            JsonObject object = element.getAsJsonObject();
+            JsonElement fluidElement = object.get("fluid");
+
+            if (fluidElement == null) {
+                CreateLiquidFuel.LOGGER.warn("Skipping {}: not a liquid burner fuel definition (no \"fluid\" field)", id);
+                continue;
+            }
+
+            final Fluid fluid;
+            try {
+                Optional<Fluid> value = BuiltInRegistries.FLUID.getOptional(ResourceLocation.parse(fluidElement.getAsString()));
+                if (value.isEmpty()) {
+                    CreateLiquidFuel.LOGGER.warn("Skipping liquid burner fuel {}: unknown fluid {}", id, fluidElement.getAsString());
+                    continue;
+                }
+                fluid = value.get();
+            } catch (ResourceLocationException e) {
+                CreateLiquidFuel.LOGGER.warn("Skipping liquid burner fuel {}: invalid fluid {}", id, fluidElement.getAsString());
+                continue;
+            }
+
+            if (fluid.builtInRegistryHolder().getData(LiquidFuels.DATA_MAP) != null) {
+                continue;
+            }
+
+            CreateLiquidFuel.LOGGER.warn(
+                    "Liquid burner fuel {} is using the deprecated data/<namespace>/compat/ format. Move it to data/createliquidfuel/data_maps/fluid/liquid_fuel.json",
+                    id
+            );
+
+            boolean superHeat = object.has("superHeat") && object.get("superHeat").getAsBoolean();
+            int burnTime = object.has("burnTime")
+                    ? object.get("burnTime").getAsInt()
+                    : superHeat ? 32 : 20;
+            int amountConsumedPerTick = object.has("amountConsumedPerTick")
+                    ? object.get("amountConsumedPerTick").getAsInt()
+                    : superHeat ? 10 : 1;
+
+            BurnerStomachHandler.LIQUID_BURNER_FUEL_MAP.put(
+                    fluid,
+                    Pair.of(IDENTIFIER, Triplet.of(burnTime, superHeat, amountConsumedPerTick))
+            );
         }
     }
 }
