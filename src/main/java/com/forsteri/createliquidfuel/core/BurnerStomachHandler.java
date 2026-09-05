@@ -34,9 +34,12 @@ public class BurnerStomachHandler {
 
         if (stomach.getFluid().getAmount() <= 0) return;
 
-        Triplet<Integer, Boolean, Integer> burnerProperty = LIQUID_BURNER_FUEL_MAP.get(
-                stomach.getFluid().getFluid()).getSecond();
+        Pair<ResourceLocation, Triplet<Integer, Boolean, Integer>> fuel =
+                LIQUID_BURNER_FUEL_MAP.get(stomach.getFluid().getFluid());
+        if (fuel == null)
+            return;
 
+        Triplet<Integer, Boolean, Integer> burnerProperty = fuel.getSecond();
         if (burnerProperty == null)
             return;
 
