@@ -22,17 +22,17 @@ import java.util.Map;
 public class BurnerStomachHandler {
     public static Map<Fluid, Pair<ResourceLocation, Triplet<Integer, Boolean, Integer>>> LIQUID_BURNER_FUEL_MAP = new HashMap<>();
 
-    public static void tick(SmartBlockEntity entity) {
-        if (!(entity instanceof BlazeBurnerAccessor burnerAccessor)) return;
+    public static boolean tick(SmartBlockEntity entity) {
+        if (!(entity instanceof BlazeBurnerAccessor burnerAccessor)) return false;
 
         @SuppressWarnings("DataFlowIssue")
         SmartFluidTank stomach = (SmartFluidTank) entity.getCapability(ForgeCapabilities.FLUID_HANDLER).orElse(null);
 
         //noinspection ConstantValue
         if (stomach == null)
-            return;
+            return false;
 
-        if (stomach.getFluid().getAmount() <= 0) return;
+        if (stomach.getFluid().getAmount() <= 0) return false;
 
         Pair<ResourceLocation, Triplet<Integer, Boolean, Integer>> fuel =
                 LIQUID_BURNER_FUEL_MAP.get(stomach.getFluid().getFluid());
@@ -41,7 +41,7 @@ public class BurnerStomachHandler {
 
         Triplet<Integer, Boolean, Integer> burnerProperty = fuel.getSecond();
         if (burnerProperty == null)
-            return;
+            return false;
 
         boolean fluidSuperHeats = burnerProperty.getSecond();
 
@@ -49,7 +49,7 @@ public class BurnerStomachHandler {
 
         if (stomach.getFluid().getAmount() < mbConsuming) {
             stomach.getFluid().setAmount(0);
-            return;
+            return false;
         }
 
         if (fluidSuperHeats)
@@ -60,12 +60,12 @@ public class BurnerStomachHandler {
         int newBurnTime = burnerAccessor.createliquidfuel$getRemainingBurnTime() + burnerProperty.getFirst();
 
         if (newBurnTime > BlazeBurnerBlockEntity.MAX_HEAT_CAPACITY)
-            return;
+            return false;
 
         burnerAccessor.createliquidfuel$setRemainingBurnTime(newBurnTime);
 
         stomach.getFluid().shrink(mbConsuming);
-
+        return true;
     }
 
     public static void tryUpdateFuel(@NotNull SmartBlockEntity entity, ItemStack itemStack, boolean forceOverflow, boolean simulate, CallbackInfoReturnable<Boolean> cir) {
@@ -88,15 +88,15 @@ public class BurnerStomachHandler {
         if (!BurnerStomachHandler.LIQUID_BURNER_FUEL_MAP.containsKey(fluidStack.getFluid()))
             return;
 
+
         if (stomach.getFluid().getAmount() + fluidStack.getAmount() > stomach.getCapacity()) {
             if (!forceOverflow) return;
         }
 
         if (!simulate) {
-            if (stomach.getFluid().isEmpty())
-                stomach.setFluid(fluidStack.copy());
-            else
-                stomach.getFluid().grow(fluidStack.getAmount());
+            int amount = fluidStack.getAmount();
+            FluidStack drained = handler.drain(amount, IFluidHandler.FluidAction.EXECUTE);
+            stomach.fill(drained, IFluidHandler.FluidAction.EXECUTE);
         }
 
         cir.setReturnValue(true);
