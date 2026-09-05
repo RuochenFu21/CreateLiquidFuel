@@ -1,0 +1,23 @@
+name: Patch Modrinth changelog
+on:
+  workflow_dispatch:
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update 3.0.0 changelog
+        env:
+          MR_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: |
+          set -euo pipefail
+          BODY=$(jq -n --arg cl $'- Fix #36: replace Gson compat/ scanning with a synced Fluid data map\n- Fix #35: skip unrelated data/<namespace>/compat/*.json instead of crashing\n- Fix #33: liquid fuel data now syncs to clients\n- Fix #11: support neoforge:conditions on fuel entries\n- Fix #28: Garnished peanut oil superheats again' '{changelog: $cl}')
+          HTTP=$(curl -sS -o /tmp/mr.json -w "%{http_code}" -X PATCH \
+            "https://api.modrinth.com/v2/version/rLn2bDVE" \
+            -H "Authorization: ${MR_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data "$BODY")
+          echo "Modrinth HTTP ${HTTP}"
+          cat /tmp/mr.json
+          echo
+          if [ "$HTTP" -ge 400 ]; then exit 1; fi
